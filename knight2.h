@@ -4,17 +4,30 @@
 #include "main.h"
 
 // #define DEBUG
-
-enum ItemType {/* TODO: */};
-
-class BaseBag {
+class Events {
 public:
-    virtual bool insertFirst(BaseItem * item);
-    virtual BaseItem * get(ItemType itemType);
-    virtual string toString() const;
+    Events(const string & file_events);
+    int count() const;
+    int get(int i) const;
+    ~Events();
 };
 
-class BaseOpponent;
+enum ItemType {ANTIDOTE = 0, PHOENIXDOWNI, PHOENIXDOWNII, PHOENIXDOWNIII, PHOENIXDOWNIV};
+class BaseOpponent{
+
+};
+
+class MadBear : public BaseOpponent{};
+class Bandit : public BaseOpponent{};
+class LordLupin : public BaseOpponent{};
+class Elf : public BaseOpponent{};
+class Troll : public BaseOpponent{};
+class Tornbery : public BaseOpponent{};
+class QueenOfCards : public BaseOpponent{};
+class NinaDeRings : public BaseOpponent{};
+class DurianGarden : public BaseOpponent{};
+class OmegaWeapon : public BaseOpponent{};
+class Hades : public BaseOpponent{};
 
 enum KnightType { PALADIN = 0, LANCELOT, DRAGON, NORMAL };
 class BaseKnight {
@@ -27,13 +40,36 @@ protected:
     int antidote;
     BaseBag * bag;
     KnightType knightType;
-
 public:
     static BaseKnight * create(int id, int maxhp, int level, int gil, int antidote, int phoenixdownI);
     string toString() const;
+    void setId(int i);
+    int getId(int i);
+    void setHP(int i, int hp);
+    int getHP(int i);
+    void setMaxHP(int i, int maxhp);
+    int getMaxHP(int i);
+    void setLevel(int i, int level);
+    int getLevel(int i);
+    void setGil(int i,int gil);
+    int getGil(int i);
+    void setAntidote(int i, int antidote);
+    int getAntidote(int i);
+};
+class PaladinKnight : public BaseKnight{
+
 };
 
-class ArmyKnights {
+class LancelotKnight : public BaseKnight{
+
+};
+class DragonKnight : public BaseKnight{
+
+};
+class NormalKnight : public BaseKnight{
+
+};
+class ArmyKnights{
 public:
     ArmyKnights (const string & file_armyknights);
     ~ArmyKnights();
@@ -41,7 +77,6 @@ public:
     bool adventure (Events * events);
     int count() const;
     BaseKnight * lastKnight() const;
-
     bool hasPaladinShield() const;
     bool hasLancelotSpear() const;
     bool hasGuinevereHair() const;
@@ -50,19 +85,37 @@ public:
     void printInfo() const;
     void printResult(bool win) const;
 };
-
 class BaseItem {
 public:
     virtual bool canUse ( BaseKnight * knight ) = 0;
     virtual void use ( BaseKnight * knight ) = 0;
 };
 
-class Events {
-public:
-    int count() const;
-    int get(int i) const;
+class Antidote : public BaseItem{
+
 };
 
+class PhoenixDownI : public BaseItem{
+
+};
+
+class PhoenixDownII : public BaseItem{
+
+};
+
+class PhoenixDownIII : public BaseItem{
+
+};
+
+class PhoenixDownIV : public BaseItem{
+
+};
+class BaseBag {
+public:
+    virtual bool insertFirst(BaseItem * item);
+    virtual BaseItem * get(ItemType itemType);
+    virtual string toString() const;
+};
 class KnightAdventure {
 private:
     ArmyKnights * armyKnights;
