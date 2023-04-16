@@ -47,6 +47,51 @@ KnightType knightCheck(int maxhp){
     else return NORMAL;
 }
 
+struct Item{
+    ItemType ItemID;
+    Item *next;
+};
+Item *createItem(ItemType item){
+    Item *newItem = new Item();
+    newItem->ItemID = item;
+    newItem->next = NULL;
+    return newItem;
+}
+void traverse(Item *head){
+    while (head != NULL) {
+        cout << head->ItemID;
+        head = head->next;
+    }
+}
+int itemCount(Item *head){
+    int count = 0;
+    while (head != NULL){
+        count ++;
+        head = head->next;
+    }
+    return count;
+}
+void itemSearch(ItemType item, Item *head) {
+    while (head != NULL){
+        if (item == head->ItemID) break;
+        else head = head->next;
+    }
+    //add more later, still not figure out what to do
+}
+ItemType itemGet(Item *head, int index){
+    int k = 0;
+    while (k < index) {
+        k++;
+        head = head->next;
+    }
+    return head->ItemID;
+}
+void addItemHead(Item **head, ItemType item){
+    Item *newItem = createItem(item);
+    newItem->next = *head;
+
+//
+}
 /*BEGIN Event class*/
 Events::Events(const string & file_events){
     ifstream f;
