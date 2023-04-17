@@ -58,7 +58,7 @@ Item *createItem(ItemType item){
     return newItem;
 }
 void traverse(Item *head){
-    while (head != NULL) {
+    while (head->next != NULL) {
         cout << head->ItemID;
         head = head->next;
     }
@@ -86,11 +86,40 @@ ItemType itemGet(Item *head, int index){
     }
     return head->ItemID;
 }
-void addItemHead(Item **head, ItemType item){
+void addItemHead(Item *&head, ItemType item){
     Item *newItem = createItem(item);
-    newItem->next = *head;
-
-//
+    newItem->next = head;
+    head = newItem;
+}
+void addItemEnd(Item *&head, ItemType item){
+    Item *newItem = createItem(item);
+    Item *temp = head;
+    if (head == NULL) {
+        head = newItem;
+        return;
+    }
+    while(temp->next != NULL){
+        temp = temp->next;
+    }
+    temp->next = newItem;
+    newItem->next = NULL;
+    
+}
+void addItemMid(Item *&head, ItemType item, int pos){
+    Item *newItem = createItem(item);
+    Item *temp1 = head;
+    Item *temp2 = head;
+    int count1 = 0, count2 = 0;
+    while (count1 != (pos - 1)) {
+        temp1 = temp1->next;
+        count1++;
+    }
+    while (count2 != pos) {
+        temp2 = temp2->next;
+        count2++;
+    }
+    temp1->next = newItem;
+    newItem->next = temp2;
 }
 /*BEGIN Event class*/
 Events::Events(const string & file_events){
