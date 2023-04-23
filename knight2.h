@@ -69,7 +69,7 @@ class DragonKnight : public BaseKnight{
 class NormalKnight : public BaseKnight{
 
 };
-class ArmyKnights{
+class ArmyKnights : public BaseKnight{
 public:
     ArmyKnights (const string & file_armyknights);
     ~ArmyKnights();

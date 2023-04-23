@@ -103,23 +103,40 @@ void addItemEnd(Item *&head, ItemType item){
     }
     temp->next = newItem;
     newItem->next = NULL;
-    
 }
 void addItemMid(Item *&head, ItemType item, int pos){
+    if (pos == 1) {
+        addItemHead(head, item);
+        return;
+    }
     Item *newItem = createItem(item);
-    Item *temp1 = head;
-    Item *temp2 = head;
-    int count1 = 0, count2 = 0;
-    while (count1 != (pos - 1)) {
-        temp1 = temp1->next;
-        count1++;
+    Item *temp = head;
+    int count = 0;
+    while (count != pos) {
+        temp = temp->next;
+        count++;
     }
-    while (count2 != pos) {
-        temp2 = temp2->next;
-        count2++;
+    newItem->next = temp->next;
+    temp->next = newItem;
+}
+void removeItemHead(Item *&head) {
+    head = head->next;
+}
+void removeItemEnd(Item *&head) {
+    Item *temp = head;
+    while ((temp->next)->next != NULL) {
+        temp = temp->next;
     }
-    temp1->next = newItem;
-    newItem->next = temp2;
+    temp->next = NULL;
+}
+void removeItemMid(Item *&head, int pos) {
+    Item *temp = head;
+    int count = 0;
+    while (count != (pos - 1)) {
+        temp = temp->next;
+        count ++;
+    }
+    temp->next = (temp->next)->next;
 }
 /*BEGIN Event class*/
 Events::Events(const string & file_events){
