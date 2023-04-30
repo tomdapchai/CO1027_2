@@ -99,29 +99,47 @@ public:
 };
 
 class Antidote : public BaseItem{
-
+    bool canUse(BaseKnight * knight);
+    void use (BaseKnight * knight);
 };
 
 class PhoenixDownI : public BaseItem{
-
+    bool canUse(BaseKnight * knight);
+    void use (BaseKnight * knight);
 };
 
 class PhoenixDownII : public BaseItem{
-
+    bool canUse(BaseKnight * knight);
+    void use (BaseKnight * knight);
 };
 
 class PhoenixDownIII : public BaseItem{
-
+    bool canUse(BaseKnight * knight);
+    void use (BaseKnight * knight);
 };
 
 class PhoenixDownIV : public BaseItem{
-
+    bool canUse(BaseKnight * knight);
+    void use (BaseKnight * knight);
 };
 class BaseBag {
 public:
+    BaseKnight * knight;
     virtual bool insertFirst(BaseItem * item);
     virtual BaseItem * get(ItemType itemType);
     virtual string toString() const;
+};
+class bagNormal : public BaseBag {
+    bagNormal(BaseKnight *knight, int numPhoenixDownI, int numantidote);
+};
+class bagPaladin : public BaseBag {
+    bagPaladin(BaseKnight *knight, int numPhoenixDownI, int numantidote);
+};
+class bagLancelot : public BaseBag {
+    bagLancelot(BaseKnight *knight, int numPhoenixDownI, int numantidote);
+};
+class bagDragon : public BaseBag {
+    bagDragon(BaseKnight *knight, int numPhoenixDownI, int numantidote);
 };
 class KnightAdventure {
 private:

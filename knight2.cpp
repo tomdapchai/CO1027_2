@@ -50,9 +50,6 @@ KnightType knightCheck(int maxhp){
     else if (dragonCheck(maxhp)) return DRAGON;
     else return NORMAL;
 }
-bool aliveCheck(BaseKnight * knight, ItemType item, int amount) {
-    
-}
 struct Item{
     ItemType ItemID;
     Item *next;
@@ -175,18 +172,52 @@ int Events::get(int i) const{
 }
 /*END Event class*/
 /* * * BEGIN implementation of class BaseBag * * */
+bool BaseBag::insertFirst(BaseItem *item) {
+
+}
 
 /* * * END implementation of class BaseBag * * */
 /*BEGIN BaseItem*/
-bool BaseItem::canUse(BaseKnight * knight) {
-    //draft
-    if (poison && item == ANTIDOTE) return true;
-    if (knight->getHP() <= 0 && item == PHOENIXDOWNI) return true; //phoenixDownI
-    if (knight->getHP() < knight->getMaxHP() / 4 && item == PHOENIXDOWNII) return true; //phoenixDownII
-    if (knight->getHP() < knight->getMaxHP() / 3 || knight->getHP() <= 0 && item == PHOENIXDOWNIII) return true; //phoenixDownIII
-    if (knight->getHP() < knight->getMaxHP() / 2 || knight->getHP() <= 0 && item == PHOENIXDOWNIV) return true; //phoenixDownIv 
+bool Antidote::canUse(BaseKnight * knight) {
+    if (poison && knight->getType() != DRAGON && knight->getAntidote()) return true;
+    else return false;
 }
-void BaseItem::use(BaseKnight * knight) {
+void Antidote::use(BaseKnight * knight) {
+    poison = false;
+}
+bool PhoenixDownI::canUse(BaseKnight * knight) {
+    if (knight->getHP() <= 0) return true;
+    else return false;
+}
+void PhoenixDownI::use(BaseKnight * knight) {
+    knight->setHP(knight->getMaxHP());
+}
+bool PhoenixDownII::canUse(BaseKnight * knight) {
+    if (knight->getHP() < (knight->getMaxHP() / 4)) return true;
+    else return false;
+}
+void PhoenixDownII::use(BaseKnight * knight) {
+    knight->setHP(knight->getMaxHP());
+}
+bool PhoenixDownIII::canUse(BaseKnight * knight) {
+    if (knight->getHP() < (knight->getMaxHP() / 3)) return true;
+    else return false;
+}
+void PhoenixDownIII::use(BaseKnight * knight) {
+    if (knight->getHP() <= 0) 
+        knight->setHP(knight->getMaxHP() / 3);
+    else
+        knight->setHP(knight->getMaxHP() / 4 + knight->getHP());
+}
+bool PhoenixDownIV::canUse(BaseKnight * knight) {
+    if (knight->getHP() < (knight->getMaxHP() / 2)) return true;
+    else return false;
+}
+void PhoenixDownIV::use(BaseKnight * knight) {
+    if (knight->getHP() <= 0)
+        knight->setHP(knight->getMaxHP() / 2);
+    else
+        knight->setHP(knight->getHP() + knight->getMaxHP() / 5);
 }
 /*END BaseItem*/
 /* * * BEGIN implementation of class BaseKnight * * */
@@ -266,7 +297,7 @@ ArmyKnights::ArmyKnights(const string & file_armyknights){
     ifstream f;
     f.open(file_armyknights);
     f >> knightNum;
-    for (int i = knightNum - 1; i >= 0; i--){
+    for (int i = 0; i < knightNum; i++){
         int hp, level, phoenixdownI, gil, antidote;
         f >> hp >> level >> phoenixdownI >> gil >> antidote;
         knight[i].setId(i);
@@ -276,6 +307,7 @@ ArmyKnights::ArmyKnights(const string & file_armyknights){
         knight[i].setGil(gil);
         knight[i].setAntidote(antidote);
     }
+    f.close();
 }
 
 bool ArmyKnights::fight(BaseOpponent * opponent) {
