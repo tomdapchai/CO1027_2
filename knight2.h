@@ -14,7 +14,20 @@ public:
 
 enum ItemType {ANTIDOTE = 0, PHOENIXDOWNI, PHOENIXDOWNII, PHOENIXDOWNIII, PHOENIXDOWNIV};
 class BaseOpponent{
-
+protected:
+    int eventCode;
+    int baseDamage;
+public:
+    int getEventCode(){
+        return eventCode;
+    }
+    void setBaseDamage(int damage) {
+        this->baseDamage = damage;
+    }
+    int getBaseDamage(){
+        return baseDamage;
+    }
+    void fight();
 };
 
 class MadBear : public BaseOpponent{};
@@ -43,33 +56,27 @@ protected:
 public:
     static BaseKnight * create(int id, int maxhp, int level, int gil, int antidote, int phoenixdownI);
     string toString() const;
-    void setId(int i);
-    int getId(int i);
-    void setHP(int i, int hp);
-    int getHP(int i);
-    void setMaxHP(int i, int maxhp);
-    int getMaxHP(int i);
-    void setLevel(int i, int level);
-    int getLevel(int i);
-    void setGil(int i,int gil);
-    int getGil(int i);
-    void setAntidote(int i, int antidote);
-    int getAntidote(int i);
+    void setId(int id);
+    int getId();
+    void setHP(int hp);
+    int getHP();
+    void setMaxHP(int maxhp);
+    int getMaxHP();
+    void setLevel(int level);
+    int getLevel();
+    void setGil(int gil);
+    int getGil();
+    void setAntidote(int antidote);
+    int getAntidote();
+    void setType(KnightType type);    
+    KnightType getType();
 };
-class PaladinKnight : public BaseKnight{
+class PaladinKnight : public BaseKnight{};
+class LancelotKnight : public BaseKnight{};
+class DragonKnight : public BaseKnight{};
+class NormalKnight : public BaseKnight{};
 
-};
-
-class LancelotKnight : public BaseKnight{
-
-};
-class DragonKnight : public BaseKnight{
-
-};
-class NormalKnight : public BaseKnight{
-
-};
-class ArmyKnights : public BaseKnight{
+class ArmyKnights{
 public:
     ArmyKnights (const string & file_armyknights);
     ~ArmyKnights();
