@@ -2,7 +2,11 @@
 int *event = new int[1000];
 BaseKnight *knight = new BaseKnight[1000];
 int eventNum, knightNum;
-
+bool paladinShield = false;
+bool lancelotSpear = false;
+bool guinevereHair = false;
+bool poison = false;
+ItemType item;
 bool primeCheck(int a){
     if (a <= 1) return false;
     if (a == 2 || a == 3) return true;
@@ -46,7 +50,9 @@ KnightType knightCheck(int maxhp){
     else if (dragonCheck(maxhp)) return DRAGON;
     else return NORMAL;
 }
-
+bool aliveCheck(BaseKnight * knight, ItemType item, int amount) {
+    
+}
 struct Item{
     ItemType ItemID;
     Item *next;
@@ -120,14 +126,25 @@ void addItemMid(Item *&head, ItemType item, int pos){
     temp->next = newItem;
 }
 void removeItemHead(Item *&head) {
+    if (head == NULL) return;
+    Item *temp = head;
     head = head->next;
+    delete temp;
 }
 void removeItemEnd(Item *&head) {
+    if (head == NULL) return;
     Item *temp = head;
+    if (temp->next == NULL) {
+        head = NULL;
+        delete temp;
+        return;
+    }
     while ((temp->next)->next != NULL) {
         temp = temp->next;
     }
+    Item *temp1 = temp->next;
     temp->next = NULL;
+    delete temp1;
 }
 void removeItemMid(Item *&head, int pos) {
     Item *temp = head;
@@ -136,7 +153,9 @@ void removeItemMid(Item *&head, int pos) {
         temp = temp->next;
         count ++;
     }
+    Item *temp1 = temp->next;
     temp->next = (temp->next)->next;
+    delete temp1;
 }
 /*BEGIN Event class*/
 Events::Events(const string & file_events){
@@ -160,10 +179,14 @@ int Events::get(int i) const{
 /* * * END implementation of class BaseBag * * */
 /*BEGIN BaseItem*/
 bool BaseItem::canUse(BaseKnight * knight) {
-    
+    //draft
+    if (poison && item == ANTIDOTE) return true;
+    if (knight->getHP() <= 0 && item == PHOENIXDOWNI) return true; //phoenixDownI
+    if (knight->getHP() < knight->getMaxHP() / 4 && item == PHOENIXDOWNII) return true; //phoenixDownII
+    if (knight->getHP() < knight->getMaxHP() / 3 || knight->getHP() <= 0 && item == PHOENIXDOWNIII) return true; //phoenixDownIII
+    if (knight->getHP() < knight->getMaxHP() / 2 || knight->getHP() <= 0 && item == PHOENIXDOWNIV) return true; //phoenixDownIv 
 }
 void BaseItem::use(BaseKnight * knight) {
-
 }
 /*END BaseItem*/
 /* * * BEGIN implementation of class BaseKnight * * */
@@ -192,44 +215,50 @@ BaseKnight *BaseKnight::create(int id, int maxhp, int level, int gil, int antido
     knight->gil = gil;
     knight->antidote = antidote;
     return knight;
+}
+void BaseKnight::setId(int id){
+    this->id = id + 1;
+}
+int BaseKnight::getId(){
+    return id;
+}
+void BaseKnight::setHP(int hp){
+    this->hp = hp;
+}
+int BaseKnight::getHP(){
+    return hp;
+}
+void BaseKnight::setLevel(int level){
+    this->level = level;
+}
+int BaseKnight::getLevel(){
+    return level;
+}
+void BaseKnight::setMaxHP(int maxhp){
+    this->maxhp = maxhp;
+}
+int BaseKnight::getMaxHP(){
+    return maxhp;
+}
+void BaseKnight::setGil(int gil){
+    this->gil = gil;
+}
+int BaseKnight::getGil(){
+    return gil;
+}
+void BaseKnight::setAntidote(int antidote){
+    this->antidote = antidote;
+}
+int BaseKnight::getAntidote(){
+    return antidote;
+}
+void BaseKnight::setType(KnightType type){
+    this->knightType = type;
+}
+KnightType BaseKnight::getType() {
+    return knightType;
+}
 
-}
-void BaseKnight::setId(int i){
-    knight[i].id = i;
-}
-int BaseKnight::getId(int i){
-    return knight[i].id;
-}
-void BaseKnight::setHP(int i, int hp){
-    knight[i].hp = hp;
-}
-int BaseKnight::getHP(int i){
-    return knight[i].hp;
-}
-void BaseKnight::setLevel(int i, int level){
-    knight[i].level = level;
-}
-int BaseKnight::getLevel(int i){
-    return knight[i].level;
-}
-void BaseKnight::setMaxHP(int i, int maxhp){
-    knight[i].maxhp = maxhp;
-}
-int BaseKnight::getMaxHP(int i){
-    return knight[i].maxhp;
-}
-void BaseKnight::setGil(int i, int gil){
-    knight[i].gil = gil;
-}
-int BaseKnight::getGil(int i){
-    return knight[i].gil;
-}
-void BaseKnight::setAntidote(int i, int antidote){
-    knight[i].antidote = antidote;
-}
-int BaseKnight::getAntidote(int i){
-    return knight[i].antidote;
-}
 /* * * END implementation of class BaseKnight * * */
 
 /* * * BEGIN implementation of class ArmyKnights * * */
@@ -237,16 +266,52 @@ ArmyKnights::ArmyKnights(const string & file_armyknights){
     ifstream f;
     f.open(file_armyknights);
     f >> knightNum;
-    for (int i = 1; i <= knightNum; i++){
+    for (int i = knightNum - 1; i >= 0; i--){
         int hp, level, phoenixdownI, gil, antidote;
-        f >> hp >>level >> phoenixdownI >> gil >> antidote;
+        f >> hp >> level >> phoenixdownI >> gil >> antidote;
         knight[i].setId(i);
-        knight[i].setHP(i, hp);
-        knight[i].setMaxHP(i, hp);
-        knight[i].setLevel(i, level);
-        knight[i].setGil(i, gil);
-        knight[i].setAntidote(i, antidote);
+        knight[i].setHP(hp);
+        knight[i].setMaxHP(hp);
+        knight[i].setLevel(level);
+        knight[i].setGil(gil);
+        knight[i].setAntidote(antidote);
     }
+}
+
+bool ArmyKnights::fight(BaseOpponent * opponent) {
+    if (opponent->getEventCode() >= 1 && opponent->getEventCode() <= 5){
+
+    }
+}
+
+bool ArmyKnights::adventure(Events * event) {
+
+}
+
+int ArmyKnights::count() const {
+
+}
+
+bool ArmyKnights::hasPaladinShield() const{
+    if (paladinShield) return true;
+    else return false;
+}
+
+bool ArmyKnights::hasLancelotSpear() const{
+    if (lancelotSpear) return true;
+    else return false;
+}
+
+bool ArmyKnights::hasGuinevereHair() const{
+    if (guinevereHair) return true;
+    else return false;
+}
+
+bool ArmyKnights::hasExcaliburSword() const{
+    if (hasPaladinShield() && hasLancelotSpear() && hasGuinevereHair())
+        return true;
+    else
+        return false;
 }
 void ArmyKnights::printInfo() const {
     cout << "No. knights: " << this->count();
