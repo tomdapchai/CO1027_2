@@ -2,10 +2,17 @@
 #define __KNIGHT2_H__
 
 #include "main.h"
-
+#define MAX_LEVEL 10
+#define MAX_GIL 999
+#define MAX_ITEM_NORMAL 19
+#define MAX_ITEM_LANCELOT 16
+#define MAX_ITEM_DRAGON 14
+#define MAX_HP 999
 // #define DEBUG
 class Events {
 public:
+    int *event = new int[1000];
+    int eventNum;
     Events(const string & file_events);
     int count() const;
     int get(int i) const;
@@ -51,6 +58,7 @@ protected:
     int level;
     int gil;
     int antidote;
+    int phoenixdownI;
     BaseBag * bag;
     KnightType knightType;
 public:
@@ -66,6 +74,8 @@ public:
     int getLevel();
     void setGil(int gil);
     int getGil();
+    void setPhoenix(int phoenixdownI);
+    int getPhoenix();
     void setAntidote(int antidote);
     int getAntidote();
     void setType(KnightType type);    
@@ -78,6 +88,7 @@ class NormalKnight : public BaseKnight{};
 
 class ArmyKnights{
 public:
+    int knightNum;
     ArmyKnights (const string & file_armyknights);
     ~ArmyKnights();
     bool fight(BaseOpponent * opponent);
@@ -94,52 +105,75 @@ public:
 };
 class BaseItem {
 public:
+    ItemType item;
+    BaseItem * next;
     virtual bool canUse ( BaseKnight * knight ) = 0;
     virtual void use ( BaseKnight * knight ) = 0;
 };
-
 class Antidote : public BaseItem{
+public:
+    Antidote();
     bool canUse(BaseKnight * knight);
     void use (BaseKnight * knight);
 };
 
 class PhoenixDownI : public BaseItem{
+public:
+    PhoenixDownI();
     bool canUse(BaseKnight * knight);
     void use (BaseKnight * knight);
 };
 
 class PhoenixDownII : public BaseItem{
+public:
+    PhoenixDownII();
     bool canUse(BaseKnight * knight);
     void use (BaseKnight * knight);
 };
 
 class PhoenixDownIII : public BaseItem{
+public:
+    PhoenixDownIII();
     bool canUse(BaseKnight * knight);
     void use (BaseKnight * knight);
 };
 
 class PhoenixDownIV : public BaseItem{
+public:
+    PhoenixDownIV();
     bool canUse(BaseKnight * knight);
     void use (BaseKnight * knight);
 };
 class BaseBag {
 public:
+    BaseItem * head = NULL;
+    int maxItem;
     BaseKnight * knight;
+    void addItemHead(ItemType item);
+    int itemCount();
     virtual bool insertFirst(BaseItem * item);
     virtual BaseItem * get(ItemType itemType);
     virtual string toString() const;
 };
 class bagNormal : public BaseBag {
+public:
     bagNormal(BaseKnight *knight, int numPhoenixDownI, int numantidote);
+    bool insertFirst(BaseItem * item);
 };
 class bagPaladin : public BaseBag {
+public:
     bagPaladin(BaseKnight *knight, int numPhoenixDownI, int numantidote);
+    bool insertFirst(BaseItem * item);
 };
 class bagLancelot : public BaseBag {
+public:
     bagLancelot(BaseKnight *knight, int numPhoenixDownI, int numantidote);
+    bool insertFirst(BaseItem * item);
 };
 class bagDragon : public BaseBag {
+public:
     bagDragon(BaseKnight *knight, int numPhoenixDownI, int numantidote);
+    bool insertFirst(BaseItem * item);
 };
 class KnightAdventure {
 private:
