@@ -8,6 +8,16 @@
 #define MAX_ITEM_LANCELOT 16
 #define MAX_ITEM_DRAGON 14
 #define MAX_HP 999
+#define MADBEAR_DAMAGE 10
+#define BANDIT_DAMAGE 15
+#define LORDLUPIN_DAMAGE 45
+#define ELF_DAMAGE 75
+#define TROLL_DAMAGE 95
+#define MADBEAR_GIL 100
+#define BANDIT_GIL 150
+#define LORDLUPIN_GIL 450
+#define ELF_GIL 750
+#define TROLL_GIL 800
 // #define DEBUG
 class Events {
 public:
@@ -24,24 +34,36 @@ class BaseOpponent{
 protected:
     int eventCode;
     int baseDamage;
+    int gil;
 public:
-    int getEventCode(){
-        return eventCode;
-    }
-    void setBaseDamage(int damage) {
-        this->baseDamage = damage;
-    }
-    int getBaseDamage(){
-        return baseDamage;
-    }
+    int getGil();
+    void setGil(int gil);
+    int getEventCode();
+    void setBaseDamage(int damage);
+    int getBaseDamage();
     void fight();
 };
 
-class MadBear : public BaseOpponent{};
-class Bandit : public BaseOpponent{};
-class LordLupin : public BaseOpponent{};
-class Elf : public BaseOpponent{};
-class Troll : public BaseOpponent{};
+class MadBear : public BaseOpponent{
+public:
+    MadBear();
+};
+class Bandit : public BaseOpponent{
+public:
+    Bandit();
+};
+class LordLupin : public BaseOpponent{
+public:
+    LordLupin();
+};
+class Elf : public BaseOpponent{
+public:
+    Elf();
+};
+class Troll : public BaseOpponent{
+public:
+    Troll();
+};
 class Tornbery : public BaseOpponent{};
 class QueenOfCards : public BaseOpponent{};
 class NinaDeRings : public BaseOpponent{};
@@ -78,6 +100,8 @@ public:
     int getPhoenix();
     void setAntidote(int antidote);
     int getAntidote();
+    void setBag(BaseBag * bag);
+    BaseBag *getBag();
     void setType(KnightType type);    
     KnightType getType();
 };
@@ -89,6 +113,7 @@ class NormalKnight : public BaseKnight{};
 class ArmyKnights{
 public:
     int knightNum;
+    BaseKnight **knight = new BaseKnight*[knightNum];
     ArmyKnights (const string & file_armyknights);
     ~ArmyKnights();
     bool fight(BaseOpponent * opponent);
@@ -146,12 +171,15 @@ public:
 };
 class BaseBag {
 public:
-    BaseItem * head = NULL;
+    BaseItem* head = NULL;
     int maxItem;
     BaseKnight * knight;
     void addItemHead(ItemType item);
     int itemCount();
     virtual bool insertFirst(BaseItem * item);
+    void removeItemHead(BaseItem *head);
+    void swapItemHead(BaseItem *head, BaseItem * need);
+    BaseItem *search(BaseItem *head, ItemType item);
     virtual BaseItem * get(ItemType itemType);
     virtual string toString() const;
 };

@@ -47,7 +47,9 @@ KnightType knightCheck(int maxhp){
     else if (dragonCheck(maxhp)) return DRAGON;
     else return NORMAL;
 }
-
+int levelO(int i, int eventID){
+    return (i + eventID) % 10 + 1;
+}
 int BaseBag::itemCount(){
     int count = 0;
     BaseItem * temp;
@@ -91,11 +93,30 @@ void BaseBag::addItemHead(ItemType item){
     newItem->next = head;
     head = newItem;
 }
-void removeItemHead(BaseItem *head) {
+void BaseBag::removeItemHead(BaseItem *head) {
     if (head == NULL) return;
     BaseItem *temp = head;
     head = head->next;
     delete temp;
+}
+BaseItem *BaseBag::search(BaseItem *head, ItemType item) {
+    BaseItem * temp = head;
+    while (temp->item != item) {
+        temp = temp->next;
+    }
+    return temp;
+}
+void BaseBag::swapItemHead(BaseItem * head, BaseItem * need) {
+    BaseItem * temp = head;
+    BaseItem * temp2 = head;
+    BaseItem * tempNeed = need;
+    while (temp->next != need) {
+        temp = temp->next;
+    }
+    temp->next = temp2;
+    temp2->next = need->next;
+    need->next = head->next;
+    head = need;
 }
 /*BEGIN Event class*/
 Events::Events(const string & file_events){
@@ -211,6 +232,7 @@ Antidote::Antidote() {
     item = ANTIDOTE;
     next = NULL;
 }
+//TODO: add swap and deleteHead method to use, still dont know how to do
 bool Antidote::canUse(BaseKnight * knight) {
     if (poison && knight->getType() != DRAGON && knight->getAntidote()) return true;
     else return false;
@@ -269,6 +291,44 @@ void PhoenixDownIV::use(BaseKnight * knight) {
         knight->setHP(knight->getHP() + knight->getMaxHP() / 5);
 }
 /*END BaseItem*/
+/*Begin BaseOpponent*/
+int BaseOpponent::getBaseDamage() {
+    return baseDamage;
+}
+void BaseOpponent::setBaseDamage(int damage){
+    this->baseDamage = damage;
+}
+int BaseOpponent::getEventCode() {
+    return eventCode;
+}
+int BaseOpponent::getGil() {
+    return gil;
+}
+void BaseOpponent::setGil(int gil) {
+    this->gil = gil;
+}
+MadBear::MadBear() {
+    setBaseDamage(MADBEAR_DAMAGE);
+    setGil(MADBEAR_GIL);
+}
+Bandit::Bandit() {
+    setBaseDamage(BANDIT_DAMAGE);
+    setGil(BANDIT_GIL);
+}
+LordLupin::LordLupin() {
+    setBaseDamage(LORDLUPIN_DAMAGE);
+    setGil(LORDLUPIN_GIL);
+}
+Elf::Elf() {
+    setBaseDamage(ELF_DAMAGE);
+    setGil(ELF_GIL);
+}
+Troll::Troll() {
+    setBaseDamage(TROLL_DAMAGE);
+    setGil(TROLL_GIL);
+}
+
+/*End BaseOpponent*/
 /* * * BEGIN implementation of class BaseKnight * * */
 string BaseKnight::toString() const {
     string typeString[4] = {"PALADIN", "LANCELOT", "DRAGON", "NORMAL"};
@@ -315,7 +375,7 @@ BaseKnight *BaseKnight::create(int id, int maxhp, int level, int gil, int antido
     return knight;
 }
 void BaseKnight::setId(int id){
-    this->id = id + 1;
+    this->id = id;
 }
 int BaseKnight::getId(){
     return id;
@@ -356,6 +416,12 @@ void BaseKnight::setPhoenix(int phoenixdownI) {
 int BaseKnight::getPhoenix() {
     return phoenixdownI;
 }
+void BaseKnight::setBag(BaseBag *bag) {
+    this->bag = bag;
+}
+BaseBag *BaseKnight::getBag() {
+    return bag;
+}
 void BaseKnight::setType(KnightType type){
     this->knightType = type;
 }
@@ -367,35 +433,78 @@ KnightType BaseKnight::getType() {
 
 /* * * BEGIN implementation of class ArmyKnights * * */
 ArmyKnights::ArmyKnights(const string & file_armyknights){
-    BaseKnight *knight = new BaseKnight[1000];
     ifstream f;
     f.open(file_armyknights);
     f >> knightNum;
-    for (int i = 0; i < knightNum; i++){
+    for (int i = 1; i <= knightNum; i++){
         int hp, level, phoenixdownI, gil, antidote;
         f >> hp >> level >> phoenixdownI >> gil >> antidote;
-        knight[i].setId(i);
-        knight[i].setHP(hp);
-        knight[i].setMaxHP(hp);
-        knight[i].setLevel(level);
-        knight[i].setGil(gil);
-        knight[i].setAntidote(antidote);
+        knight[i]->setId(i);
+        knight[i]->setHP(hp);
+        knight[i]->setMaxHP(hp);
+        knight[i]->setLevel(level);
+        knight[i]->setPhoenix(phoenixdownI);
+        knight[i]->setGil(gil);
+        knight[i]->setAntidote(antidote);
+        BaseBag * bag;
+        knight[i]->setType(knightCheck(knight[i]->getMaxHP()));
+        switch (knight[i]->getType()) {
+            case NORMAL:
+                bag = new bagNormal(knight[i], knight[i]->getPhoenix(), knight[i]->getAntidote());
+                break;
+            case PALADIN:
+                bag = new bagPaladin(knight[i], knight[i]->getPhoenix(), knight[i]->getAntidote());
+                break;
+            case LANCELOT:
+                bag = new bagLancelot(knight[i], knight[i]->getPhoenix(), knight[i]->getAntidote());
+                break;
+            case DRAGON:
+                bag = new bagDragon(knight[i], knight[i]->getPhoenix(), knight[i]->getAntidote());
+                break;
+            default:
+                break;
+        }
+        knight[i]->setBag(bag);
     }
     f.close();
 }
 
-bool ArmyKnights::fight(BaseOpponent * opponent) {
+bool ArmyKnights::fight(BaseOpponent * opponent) {//use to check if win an opponent
+    int code = opponent->getEventCode();
+    switch (code)
+    {
+    case 1:
+        opponent = new MadBear();
+        break;
+    case 2:
+        opponent = new Bandit();
+        break;
+    case 3:
+        opponent = new LordLupin();
+        break;
+    case 4:
+        opponent = new Elf();
+        break;
+    case 5:
+        opponent = new Troll();
+        break;
+    default:
+        break;
+    }
+    
+}
+
+bool ArmyKnights::adventure(Events * event) {//use to perform action, the final return is if the army win or not
 
 }
 
-bool ArmyKnights::adventure(Events * event) {
+int ArmyKnights::count() const {//use to count number of knight left
 
 }
-
-int ArmyKnights::count() const {
-
+BaseKnight *ArmyKnights::lastKnight() const{
+    if (knightNum == 0) return NULL;
+    else return knight[knightNum];
 }
-
 bool ArmyKnights::hasPaladinShield() const{
     if (paladinShield) return true;
     else return false;
