@@ -1,8 +1,18 @@
 #include "knight2.h"
+bool omegaWeapon = false;
+bool hades = false;
 bool paladinShield = false;
 bool lancelotSpear = false;
 bool guinevereHair = false;
 bool poison = false;
+int checkLevel(int level) {
+    if (level >= MAX_LEVEL) level = MAX_LEVEL;
+    return level;
+}
+bool checkGil(int gil) {
+    if (gil >= MAX_GIL) return false;
+    else return true;
+}
 bool primeCheck(int a){
     if (a <= 1) return false;
     if (a == 2 || a == 3) return true;
@@ -81,7 +91,9 @@ void BaseBag::addItemHead(ItemType item){
             newItem = new Antidote();
             break;
     }
-    newItem->next = head;
+    if (head != NULL) {
+        newItem->next = head;
+    }
     head = newItem;
 }
 void BaseBag::removeItemHead(BaseItem *head) {
@@ -553,7 +565,9 @@ ArmyKnights::ArmyKnights(const string & file_armyknights){
     }
     f.close();
 }
-
+void ArmyKnights::transferGil() {
+    knight[lastKnight()->getId() - 1]->setGil(knight[lastKnight()->getId() - 1]->getGil() + lastKnight()->getGil() - MAX_GIL);
+}
 bool ArmyKnights::fight(BaseOpponent * opponent) {//use to check if win an opponent
     switch (opponent->getEventCode())
     {
@@ -572,7 +586,7 @@ bool ArmyKnights::fight(BaseOpponent * opponent) {//use to check if win an oppon
     case 5:
         opponent = new Troll();
         break;
-    case 6:
+    /*case 6:
         opponent = new Tornbery();
         break;
     case 7:
@@ -608,11 +622,13 @@ bool ArmyKnights::fight(BaseOpponent * opponent) {//use to check if win an oppon
     case 97:
         opponent = new GuinevereHair();
     default:
-        break;
+        break;*/
     }
     if (opponent->getEventCode() <= 5) {
         if (lastKnight()->getType() == PALADIN || lastKnight()->getType() == LANCELOT) {
             lastKnight()->setGil(lastKnight()->getGil() + opponent->getGil());
+            if (!checkGil(lastKnight()->getGil())) 
+                transferGil();
             return true;
         }
         else {
@@ -627,21 +643,79 @@ bool ArmyKnights::fight(BaseOpponent * opponent) {//use to check if win an oppon
         }
     }
     if (opponent->getEventCode() == 6) {
-        if (lastKnight()->getLevel() >= levelO(opponent->getOrder(), opponent->getEventCode())) 
+        if (lastKnight()->getLevel() >= levelO(opponent->getOrder(), opponent->getEventCode())) {
+            lastKnight()->setLevel(lastKnight()->getLevel() + 1);
+            lastKnight()->setLevel(checkLevel(lastKnight()->getLevel()));
             return true;
+        }
         else {
-            if (lastKnight()->getAntidote()) {
-                lastKnight()->getBag()->use(lastKnight(), lastKnight()->getBag()->search(lastKnight()->getBag()->head, ANTIDOTE));
-                lastKnight()->setAntidote(lastKnight()->getAntidote() - 1);
-            }
-            else {
-                lastKnight()->setHP(lastKnight()->getHP() - 10);
-                if (lastKnight()->getHP() <= 0) {
-                    if (!lastKnight()->checkRecover()) 
-                        knightNum--;
+            if (lastKnight()->getType() != DRAGON) {
+                if (lastKnight()->getAntidote()) {
+                    lastKnight()->getBag()->use(lastKnight(), lastKnight()->getBag()->search(lastKnight()->getBag()->head, ANTIDOTE));
+                    lastKnight()->setAntidote(lastKnight()->getAntidote() - 1);
+                }
+                else {
+                    lastKnight()->setHP(lastKnight()->getHP() - 10);
+                    if (lastKnight()->getBag()->itemCount() >= 3) {
+                        for (int i = 0; i < 3; i++) {
+                            lastKnight()->getBag()->removeItemHead(lastKnight()->getBag()->head);
+                        }
+                    }
+                    else {
+                        if (lastKnight()->getBag()->itemCount() > 0)
+                            for (int i = 0; i < lastKnight()->getBag()->itemCount(); i++)
+                                lastKnight()->getBag()->removeItemHead(lastKnight()->getBag()->head);
+                    }
+                    if (lastKnight()->getHP() <= 0) {
+                        if (!lastKnight()->checkRecover()) 
+                            knightNum--;
+                    }
                 }
             }
+            return false;
         }
+    }
+    if (opponent->getEventCode() == 7) {
+        if (lastKnight()->getLevel() >= levelO(opponent->getOrder(), opponent->getEventCode())) {
+            lastKnight()->setGil(lastKnight()->getGil() * 2);
+            if (!checkGil(lastKnight()->getGil()))
+                transferGil();
+            return true;
+        }
+        else {
+            lastKnight()->setGil(lastKnight()->getGil() / 2);
+            return false;
+        }
+    }
+    if (opponent->getEventCode() == 8) {
+        if (lastKnight()->getGil() >= 50 && (lastKnight()->getHP() < lastKnight()->getMaxHP() / 3)) {
+            lastKnight()->setGil(lastKnight()->getGil() - 50);
+            lastKnight()->setHP(lastKnight()->getHP() + lastKnight()->getMaxHP() / 5);
+        }
+        return true;
+    }
+    if (opponent->getEventCode() == 9) {
+        lastKnight()->setHP(lastKnight()->getMaxHP());
+        return true;
+    }
+    if (opponent->getEventCode() == 10) {
+        if ((lastKnight()->getHP() == lastKnight()->getMaxHP() && lastKnight()->getLevel() == MAX_LEVEL) || lastKnight()->getType() == DRAGON) {
+            lastKnight()->setLevel(MAX_LEVEL);
+            lastKnight()->setGil(MAX_GIL);
+            return true;
+        }
+            
+        else {
+            //HP = 0, implement method and function to either rescue or not
+            lastKnight()->setHP(0);
+            if (!lastKnight()->checkRecover())
+                knightNum --;
+            return false;
+        }
+        omegaWeapon = true;
+    }
+    if (opponent->getEventCode() == 11) {
+        //not hard
     }
     /*return lastKnight()->fight(opponent); // implement*/
 }

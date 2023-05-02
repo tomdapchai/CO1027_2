@@ -146,13 +146,13 @@ public:
     ~ArmyKnights();
     bool fight(BaseOpponent * opponent);
     bool adventure (Events * events);
+    void transferGil(); //edit more
     int count() const;
     BaseKnight * lastKnight() const;
     bool hasPaladinShield() const;
     bool hasLancelotSpear() const;
     bool hasGuinevereHair() const;
     bool hasExcaliburSword() const;
-
     void printInfo() const;
     void printResult(bool win) const;
 };
