@@ -35,7 +35,10 @@ protected:
     int eventCode;
     int baseDamage;
     int gil;
+    int levelO;
 public:
+    int getLevelO();
+    void setLevelO(int levelO);
     int getGil();
     void setGil(int gil);
     int getEventCode();
@@ -102,13 +105,31 @@ public:
     int getAntidote();
     void setBag(BaseBag * bag);
     BaseBag *getBag();
-    void setType(KnightType type);    
+    void setType(KnightType type);
+    bool checkRecover();    
     KnightType getType();
+    virtual bool fight(BaseOpponent * opponent);
 };
-class PaladinKnight : public BaseKnight{};
-class LancelotKnight : public BaseKnight{};
-class DragonKnight : public BaseKnight{};
-class NormalKnight : public BaseKnight{};
+class PaladinKnight : public BaseKnight{
+public:
+    PaladinKnight();
+    bool fight(BaseOpponent * opponent);
+};
+class LancelotKnight : public BaseKnight{
+public:
+    LancelotKnight();
+    bool fight(BaseOpponent * opponent);
+};
+class DragonKnight : public BaseKnight{
+public:
+    DragonKnight();
+    bool fight(BaseOpponent * opponent);
+};
+class NormalKnight : public BaseKnight{
+public:
+    NormalKnight();
+    bool fight(BaseOpponent * opponent);
+};
 
 class ArmyKnights{
 public:
@@ -177,8 +198,10 @@ public:
     void addItemHead(ItemType item);
     int itemCount();
     virtual bool insertFirst(BaseItem * item);
+    virtual void use(BaseKnight * knight);
     void removeItemHead(BaseItem *head);
     void swapItemHead(BaseItem *head, BaseItem * need);
+    BaseItem * searchPhoenixFirst(BaseItem * head, BaseKnight * knight);
     BaseItem *search(BaseItem *head, ItemType item);
     virtual BaseItem * get(ItemType itemType);
     virtual string toString() const;
