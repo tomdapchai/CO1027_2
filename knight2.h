@@ -32,13 +32,14 @@ public:
 enum ItemType {ANTIDOTE = 0, PHOENIXDOWNI, PHOENIXDOWNII, PHOENIXDOWNIII, PHOENIXDOWNIV};
 class BaseOpponent{
 protected:
+    int order;
     int eventCode;
     int baseDamage;
     int gil;
     int levelO;
 public:
-    int getLevelO();
-    void setLevelO(int levelO);
+    int getOrder();
+    void setOrder(int order);
     int getGil();
     void setGil(int gil);
     int getEventCode();
@@ -73,6 +74,12 @@ class NinaDeRings : public BaseOpponent{};
 class DurianGarden : public BaseOpponent{};
 class OmegaWeapon : public BaseOpponent{};
 class Hades : public BaseOpponent{};
+class PhoenixII : public BaseOpponent{};
+class PhoenixIII : public BaseOpponent{};
+class PhoenixIV : public BaseOpponent{};
+class PaladinShield : public BaseOpponent{};
+class LancelotSpear : public BaseOpponent{};
+class GuinevereHair : public BaseOpponent{};
 
 enum KnightType { PALADIN = 0, LANCELOT, DRAGON, NORMAL };
 class BaseKnight {
@@ -108,7 +115,7 @@ public:
     void setType(KnightType type);
     bool checkRecover();    
     KnightType getType();
-    virtual bool fight(BaseOpponent * opponent);
+    virtual bool fight(BaseOpponent * opponent) = 0;
 };
 class PaladinKnight : public BaseKnight{
 public:
@@ -198,7 +205,7 @@ public:
     void addItemHead(ItemType item);
     int itemCount();
     virtual bool insertFirst(BaseItem * item);
-    virtual void use(BaseKnight * knight);
+    virtual void use(BaseKnight * knight, BaseItem * item);
     void removeItemHead(BaseItem *head);
     void swapItemHead(BaseItem *head, BaseItem * need);
     BaseItem * searchPhoenixFirst(BaseItem * head, BaseKnight * knight);
