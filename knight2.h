@@ -141,12 +141,14 @@ public:
 class ArmyKnights{
 public:
     int knightNum;
+    int lastID;
     BaseKnight **knight = new BaseKnight*[knightNum];
     ArmyKnights (const string & file_armyknights);
     ~ArmyKnights();
     bool fight(BaseOpponent * opponent);
     bool adventure (Events * events);
-    void transferGil(); //edit more
+    void transferGil(); // edit more
+    void transferItem(); //edit more
     int count() const;
     BaseKnight * lastKnight() const;
     bool hasPaladinShield() const;
@@ -198,9 +200,12 @@ public:
     void use (BaseKnight * knight);
 };
 class BaseBag {
+protected:
+    int maxItem;
 public:
     BaseItem* head = NULL;
-    int maxItem;
+    int getMaxItem();
+    void setMaxItem(int maxItem);
     BaseKnight * knight;
     void addItemHead(ItemType item);
     int itemCount();
@@ -237,7 +242,6 @@ class KnightAdventure {
 private:
     ArmyKnights * armyKnights;
     Events * events;
-
 public:
     KnightAdventure();
     ~KnightAdventure(); // TODO:
