@@ -43,6 +43,7 @@ public:
     int getGil();
     void setGil(int gil);
     int getEventCode();
+    void setEventCode(int eventCode);
     void setBaseDamage(int damage);
     int getBaseDamage();
     void fight();
@@ -68,18 +69,6 @@ class Troll : public BaseOpponent{
 public:
     Troll();
 };
-class Tornbery : public BaseOpponent{};
-class QueenOfCards : public BaseOpponent{};
-class NinaDeRings : public BaseOpponent{};
-class DurianGarden : public BaseOpponent{};
-class OmegaWeapon : public BaseOpponent{};
-class Hades : public BaseOpponent{};
-class PhoenixII : public BaseOpponent{};
-class PhoenixIII : public BaseOpponent{};
-class PhoenixIV : public BaseOpponent{};
-class PaladinShield : public BaseOpponent{};
-class LancelotSpear : public BaseOpponent{};
-class GuinevereHair : public BaseOpponent{};
 
 enum KnightType { PALADIN = 0, LANCELOT, DRAGON, NORMAL };
 class BaseKnight {
@@ -148,7 +137,7 @@ public:
     bool fight(BaseOpponent * opponent);
     bool adventure (Events * events);
     void transferGil(); // edit more
-    void transferItem(); //edit more
+    void transferItem(ItemType item); //edit more
     int count() const;
     BaseKnight * lastKnight() const;
     bool hasPaladinShield() const;
