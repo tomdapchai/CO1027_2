@@ -19,6 +19,14 @@
 #define ELF_GIL 750
 #define TROLL_GIL 800
 // #define DEBUG
+class Events;
+class BaseKnight;
+class ArmyKnights;
+class BaseOpponent;
+class BaseItem;
+class BaseBag;
+class KnightAdventure;
+
 class Events {
 public:
     int *event = new int[1000];
@@ -38,7 +46,7 @@ protected:
     int gil;
     int levelO;
 public:
-    int getOrder();
+    int getOrder(); //havent done this
     void setOrder(int order);
     int getGil();
     void setGil(int gil);
@@ -70,83 +78,6 @@ public:
     Troll();
 };
 
-enum KnightType { PALADIN = 0, LANCELOT, DRAGON, NORMAL };
-class BaseKnight {
-protected:
-    int id;
-    int hp;
-    int maxhp;
-    int level;
-    int gil;
-    int antidote;
-    int phoenixdownI;
-    BaseBag * bag;
-    KnightType knightType;
-public:
-    static BaseKnight * create(int id, int maxhp, int level, int gil, int antidote, int phoenixdownI);
-    string toString() const;
-    void setId(int id);
-    int getId();
-    void setHP(int hp);
-    int getHP();
-    void setMaxHP(int maxhp);
-    int getMaxHP();
-    void setLevel(int level);
-    int getLevel();
-    void setGil(int gil);
-    int getGil();
-    void setPhoenix(int phoenixdownI);
-    int getPhoenix();
-    void setAntidote(int antidote);
-    int getAntidote();
-    void setBag(BaseBag * bag);
-    BaseBag *getBag();
-    void setType(KnightType type);
-    bool checkRecover();    
-    KnightType getType();
-    virtual bool fight(BaseOpponent * opponent) = 0;
-};
-class PaladinKnight : public BaseKnight{
-public:
-    PaladinKnight();
-    bool fight(BaseOpponent * opponent);
-};
-class LancelotKnight : public BaseKnight{
-public:
-    LancelotKnight();
-    bool fight(BaseOpponent * opponent);
-};
-class DragonKnight : public BaseKnight{
-public:
-    DragonKnight();
-    bool fight(BaseOpponent * opponent);
-};
-class NormalKnight : public BaseKnight{
-public:
-    NormalKnight();
-    bool fight(BaseOpponent * opponent);
-};
-
-class ArmyKnights{
-public:
-    int knightNum;
-    int lastID;
-    BaseKnight **knight = new BaseKnight*[knightNum];
-    ArmyKnights (const string & file_armyknights);
-    ~ArmyKnights();
-    bool fight(BaseOpponent * opponent);
-    bool adventure (Events * events);
-    void transferGil(); // edit more
-    void transferItem(ItemType item); //edit more
-    int count() const;
-    BaseKnight * lastKnight() const;
-    bool hasPaladinShield() const;
-    bool hasLancelotSpear() const;
-    bool hasGuinevereHair() const;
-    bool hasExcaliburSword() const;
-    void printInfo() const;
-    void printResult(bool win) const;
-};
 class BaseItem {
 public:
     ItemType item;
@@ -188,6 +119,7 @@ public:
     bool canUse(BaseKnight * knight);
     void use (BaseKnight * knight);
 };
+
 class BaseBag {
 protected:
     int maxItem;
@@ -196,15 +128,14 @@ public:
     int getMaxItem();
     void setMaxItem(int maxItem);
     BaseKnight * knight;
-    void addItemHead(ItemType item);
+    void addItemHead(BaseItem *&head, ItemType item);
     int itemCount();
-    virtual bool insertFirst(BaseItem * item);
+    virtual bool insertFirst(BaseItem * item) = 0;
     virtual void use(BaseKnight * knight, BaseItem * item);
-    void removeItemHead(BaseItem *head);
-    void swapItemHead(BaseItem *head, BaseItem * need);
+    void removeItemHead(BaseItem *&head);
+    void swapItemHead(BaseItem *&head, BaseItem * need);
     BaseItem * searchPhoenixFirst(BaseItem * head, BaseKnight * knight);
     BaseItem *search(BaseItem *head, ItemType item);
-    virtual BaseItem * get(ItemType itemType);
     virtual string toString() const;
 };
 class bagNormal : public BaseBag {
@@ -227,14 +158,71 @@ public:
     bagDragon(BaseKnight *knight, int numPhoenixDownI, int numantidote);
     bool insertFirst(BaseItem * item);
 };
+
+enum KnightType { PALADIN = 0, LANCELOT, DRAGON, NORMAL };
+class BaseKnight {
+protected:
+    int id;
+    int hp;
+    int maxhp;
+    int level;
+    int gil;
+    int antidote;
+    int phoenixdownI;
+    BaseBag * bag;
+    KnightType knightType;
+public:
+    static BaseKnight * create(int id, int maxhp, int level, int gil, int antidote, int phoenixdownI);
+    string toString() const;
+    void setId(int id);
+    int getId();
+    void setHP(int hp);
+    int getHP();
+    void setMaxHP(int maxhp);
+    int getMaxHP();
+    void setLevel(int level);
+    int getLevel();
+    void setGil(int gil);
+    int getGil();
+    void setPhoenix(int phoenixdownI);
+    int getPhoenix();
+    void setAntidote(int antidote);
+    int getAntidote();
+    void setBag(BaseBag * bag);
+    BaseBag *getBag();
+    void setType(KnightType type);
+    bool checkRecover();    
+    KnightType getType();
+};
+
+class ArmyKnights{
+public:
+    int knightNum;
+    int lastID;
+    BaseKnight **knight = new BaseKnight*[knightNum];
+    ArmyKnights (const string & file_armyknights);
+    ~ArmyKnights();
+    bool fight(BaseOpponent * opponent);
+    bool adventure (Events * events);
+    void transferGil(); // edit more
+    void transferItem(ItemType item); //edit more
+    int count() const;
+    BaseKnight * lastKnight() const;
+    bool hasPaladinShield() const;
+    bool hasLancelotSpear() const;
+    bool hasGuinevereHair() const;
+    bool hasExcaliburSword() const;
+    void printInfo() const;
+    void printResult(bool win) const;
+};
+
 class KnightAdventure {
 private:
     ArmyKnights * armyKnights;
     Events * events;
 public:
     KnightAdventure();
-    ~KnightAdventure(); // TODO:
-
+    ~KnightAdventure();
     void loadArmyKnights(const string &);
     void loadEvents(const string &);
     void run();
