@@ -58,6 +58,9 @@ KnightType knightCheck(int maxhp){
     else if (dragonCheck(maxhp)) return DRAGON;
     else return NORMAL;
 }
+int levelO(int i, int eventID){
+    return (i + eventID) % 10 + 1;
+}
 /*BEGIN Event class*/
 Events::Events(const string & file_events){
     ifstream f;
@@ -80,9 +83,8 @@ int Events::get(int i) const{
     return event[i];
 }
 /*END Event class*/
-int levelO(int i, int eventID){
-    return (i + eventID) % 10 + 1;
-}
+
+/* * * BEGIN implementation of class BaseBag * * */
 void BaseBag::setMaxItem(int maxItem) {
     this->maxItem = maxItem;
 }
@@ -100,8 +102,6 @@ int BaseBag::itemCount(){
     return count;
 }
 void BaseBag::addItemHead(BaseItem *&head, ItemType item){
-    if (head == NULL)
-        return;
     BaseItem *newItem;
     switch (item) {
         case ANTIDOTE:
@@ -123,9 +123,7 @@ void BaseBag::addItemHead(BaseItem *&head, ItemType item){
             newItem = new Antidote();
             break;
     }
-    if (head != NULL) {
-        newItem->next = head;
-    }
+    newItem->next = head;
     head = newItem;
 }
 void BaseBag::removeItemHead(BaseItem *&head) {
@@ -175,11 +173,11 @@ BaseItem * BaseBag::searchPhoenixFirst(BaseItem * head, BaseKnight * knight) {
 void BaseBag::use(BaseKnight * knight, BaseItem * item) {
     swapItemHead(knight->getBag()->head, item);
     knight->getBag()->head->use(knight);
-    removeItemHead(head);
+    removeItemHead(knight->getBag()->head);
 }
-/* * * BEGIN implementation of class BaseBag * * */
+
 bagNormal::bagNormal(BaseKnight * knight, int phoenixDownI, int antidote) {
-    setMaxItem(MAX_ITEM_NORMAL);
+    this->setMaxItem(MAX_ITEM_NORMAL);
     if (phoenixDownI > 0) {
         for (int i = 0; i < phoenixDownI; i++) {
             addItemHead(head, PHOENIXDOWNI);
@@ -196,7 +194,7 @@ bool bagNormal::insertFirst(BaseItem * item) {
     else return false;
 }
 bagLancelot::bagLancelot(BaseKnight * knight, int phoenixDownI, int antidote) {
-    setMaxItem(MAX_ITEM_LANCELOT);    
+    this->setMaxItem(MAX_ITEM_LANCELOT);    
     if (phoenixDownI > 0) {
         for (int i = 0; i < phoenixDownI; i++) {
             addItemHead(head, PHOENIXDOWNI);
@@ -228,7 +226,7 @@ bool bagPaladin::insertFirst(BaseItem * item) {
     return true;
 }
 bagDragon::bagDragon(BaseKnight * knight, int phoenixDownI, int antidote) {
-    setMaxItem(MAX_ITEM_DRAGON);
+    this->setMaxItem(MAX_ITEM_DRAGON);
     if (phoenixDownI > 0) {
         for (int i = 0; i < phoenixDownI; i++) {
             addItemHead(head, PHOENIXDOWNI);
@@ -265,6 +263,7 @@ string BaseBag::toString() const{
         default:
             break;
         }
+        temp = temp->next;
         count ++;
     }
     s = "Bag[count=" + to_string(count) + ";" + list + "]";
@@ -401,7 +400,6 @@ string BaseKnight::toString() const {
 }
 BaseKnight *BaseKnight::create(int id, int maxhp, int level, int gil, int antidote, int phoenixdownI){
     BaseKnight *knight = new BaseKnight(); //error?
-    knight->knightType = knightCheck(maxhp);
     knight->id = id;
     knight->maxhp = maxhp;
     knight->hp = maxhp;
@@ -409,11 +407,9 @@ BaseKnight *BaseKnight::create(int id, int maxhp, int level, int gil, int antido
     knight->gil = gil;
     knight->antidote = antidote;
     knight->phoenixdownI = phoenixdownI;
+    knight->knightType = knightCheck(maxhp);
     switch (knight->knightType)
     {
-    case NORMAL:
-        knight->bag = new bagNormal(knight, phoenixdownI,antidote);
-        break;
     case PALADIN:
         knight->bag = new bagPaladin(knight, phoenixdownI, antidote);
         break;
@@ -424,6 +420,7 @@ BaseKnight *BaseKnight::create(int id, int maxhp, int level, int gil, int antido
         knight->bag = new bagDragon(knight, phoenixdownI, antidote);
         break;
     default:
+        knight->bag = new bagNormal(knight, phoenixdownI,antidote);
         break;
     }
     return knight;
@@ -509,29 +506,16 @@ ArmyKnights::ArmyKnights(const string & file_armyknights){
     ifstream f;
     f.open(file_armyknights);
     f >> knightNum;
-    for (int i = 1; i <= knightNum; i++){
+    lastID = knightNum;
+    knight = new BaseKnight*[knightNum];
+    for (int i = 0; i < knightNum; i++){
         int hp, level, phoenixdownI, gil, antidote;
         f >> hp >> level >> phoenixdownI >> gil >> antidote;
-        knight[i] = knight[i]->create(i, hp, level, gil, antidote, phoenixdownI);
+        knight[i] = BaseKnight::create(i + 1, hp, level, gil, antidote, phoenixdownI);
     }
     f.close();
 }
 void ArmyKnights::transferGil() {
-    /*static int i = lastID - 1;
-    while (i > 0) {
-        i--;
-        knight[i]->setGil(knight[i]->getGil() + knight[i + 1]->getGil() - MAX_GIL);
-        if (knight[i]->getGil() <= MAX_GIL) {
-            i = lastID - 1; //idk if this work
-            break;
-        }
-        else
-            transferGil();
-    }
-    if (knight[1]->getGil() > MAX_GIL) {
-        knight[1]->setGil(MAX_GIL);
-        i = lastID - 1;
-    }*/
     int i = lastID;
     while (i > 1) {
         int diff = knight[i]->getGil() - MAX_GIL;
@@ -767,19 +751,27 @@ bool ArmyKnights::fight(BaseOpponent * opponent) {//use to check if lastKnight s
             return false;
         }
     }
-    /*return lastKnight()->fight(opponent); // implement*/
 }
 
+
 bool ArmyKnights::adventure(Events * event) {//use to perform action, the final return is if the army win or not
-    for (int i = 0; i < event->eventNum; i++) {
+    cout << event->count() << endl;
+    cout << win << endl;
+    cout << lastKnight()->getBag()->toString() << endl; //ik what's wrong
+    for (int i = 0; i < event->count(); i++) {
+        if (omegaWeapon && event->get(i) == 10)
+            continue;
+        if (hades && event->get(i) == 11)
+            continue;
         //you know what to do
+        cout << "OK \n";
         BaseOpponent * opponent;
         opponent->setEventCode(event->get(i));
         opponent->setOrder(i);
-        if (fight(opponent)) {
-            // actually the method fight is check if the lastKnight() dead or not lmao, fix it easy
+        // printInfo(); //bug at lastKnight()
+        cout << "OK1 \n";
+        if (fight(opponent)) 
             continue;
-        }
         else {
             if (!knightNum) {
                 lastID--;
@@ -788,10 +780,12 @@ bool ArmyKnights::adventure(Events * event) {//use to perform action, the final 
             else 
                 return false;
         }
+        cout << "OK2 \n";
         if (lastKnight()->getBag()->searchPhoenixFirst(lastKnight()->getBag()->head, lastKnight()) != NULL)
             lastKnight()->getBag()->use(lastKnight(), lastKnight()->getBag()->searchPhoenixFirst(lastKnight()->getBag()->head, lastKnight()));
-        
+        delete opponent;
         printInfo();
+        cout << "why" << endl;
     }
     return win;
 }
@@ -801,7 +795,7 @@ int ArmyKnights::count() const {//use to count number of knight left
 }
 BaseKnight *ArmyKnights::lastKnight() const{
     if (knightNum == 0) return NULL;
-    else return knight[lastID];
+    else return knight[lastID - 1];
 }
 bool ArmyKnights::hasPaladinShield() const{
     return paladinShield;
@@ -856,7 +850,9 @@ KnightAdventure::KnightAdventure() {
     events = nullptr;
 }
 void KnightAdventure::loadArmyKnights(const string & file_armyknights) {
+    cout << "OK" << endl;
     armyKnights = new ArmyKnights(file_armyknights);
+    cout << "OK" << endl;
 }
 void KnightAdventure::loadEvents(const string & file_events) {
     events = new Events(file_events);
@@ -865,7 +861,6 @@ void KnightAdventure::run() {
     //implement adventure
     if (armyKnights && events) 
         armyKnights->printResult(armyKnights->adventure(events)); //should works more on this lol, why it just show the WIN lmao
-    //print result at the end
 }
 KnightAdventure::~KnightAdventure() {
     if (armyKnights && events) {

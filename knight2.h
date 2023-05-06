@@ -199,7 +199,7 @@ class ArmyKnights{
 public:
     int knightNum;
     int lastID;
-    BaseKnight **knight = new BaseKnight*[knightNum];
+    BaseKnight **knight;
     ArmyKnights (const string & file_armyknights);
     ~ArmyKnights();
     bool fight(BaseOpponent * opponent);
