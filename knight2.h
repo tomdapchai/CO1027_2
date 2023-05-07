@@ -48,34 +48,13 @@ protected:
 public:
     int getOrder(); //havent done this
     void setOrder(int order);
-    int getGil();
-    void setGil(int gil);
+    int getGilReward();
+    void setGilReward(int gil);
     int getEventCode();
     void setEventCode(int eventCode);
     void setBaseDamage(int damage);
     int getBaseDamage();
     void fight();
-};
-
-class MadBear : public BaseOpponent{
-public:
-    MadBear();
-};
-class Bandit : public BaseOpponent{
-public:
-    Bandit();
-};
-class LordLupin : public BaseOpponent{
-public:
-    LordLupin();
-};
-class Elf : public BaseOpponent{
-public:
-    Elf();
-};
-class Troll : public BaseOpponent{
-public:
-    Troll();
 };
 
 class BaseItem {
@@ -137,6 +116,7 @@ public:
     BaseItem * searchPhoenixFirst(BaseItem * head, BaseKnight * knight);
     BaseItem *search(BaseItem *head, ItemType item);
     virtual string toString() const;
+    ~BaseBag();
 };
 class bagNormal : public BaseBag {
 public:
@@ -175,24 +155,24 @@ public:
     static BaseKnight * create(int id, int maxhp, int level, int gil, int antidote, int phoenixdownI);
     string toString() const;
     void setId(int id);
-    int getId();
+    int getId() const;
     void setHP(int hp);
-    int getHP();
+    int getHP() const;
     void setMaxHP(int maxhp);
-    int getMaxHP();
+    int getMaxHP() const;
     void setLevel(int level);
-    int getLevel();
+    int getLevel() const;
     void setGil(int gil);
-    int getGil();
+    int getGil() const;
     void setPhoenix(int phoenixdownI);
-    int getPhoenix();
+    int getPhoenix() const;
     void setAntidote(int antidote);
-    int getAntidote();
+    int getAntidote() const;
     void setBag(BaseBag * bag);
-    BaseBag *getBag();
+    BaseBag *getBag() const;
     void setType(KnightType type);
     bool checkRecover();    
-    KnightType getType();
+    KnightType getType() const;
 };
 
 class ArmyKnights{
