@@ -46,15 +46,14 @@ protected:
     int gil;
     int levelO;
 public:
-    int getOrder(); //havent done this
+    int getOrder() const; //havent done this
     void setOrder(int order);
-    int getGilReward();
+    int getGilReward() const;
     void setGilReward(int gil);
-    int getEventCode();
+    int getEventCode() const;
     void setEventCode(int eventCode);
     void setBaseDamage(int damage);
-    int getBaseDamage();
-    void fight();
+    int getBaseDamage() const;
 };
 
 class BaseItem {
@@ -107,14 +106,14 @@ public:
     int getMaxItem();
     void setMaxItem(int maxItem);
     BaseKnight * knight;
-    void addItemHead(BaseItem *&head, ItemType item);
+    void addItemHead(ItemType item);
     int itemCount();
     virtual bool insertFirst(BaseItem * item) = 0;
     virtual void use(BaseKnight * knight, BaseItem * item);
-    void removeItemHead(BaseItem *&head);
-    void swapItemHead(BaseItem *&head, BaseItem * need);
-    BaseItem * searchPhoenixFirst(BaseItem * head, BaseKnight * knight);
-    BaseItem *search(BaseItem *head, ItemType item);
+    void removeItemHead();
+    void swapItemHead(BaseItem * need);
+    BaseItem * searchPhoenixFirst(BaseKnight * knight);
+    BaseItem *search(ItemType item);
     virtual string toString() const;
     ~BaseBag();
 };
@@ -168,8 +167,7 @@ public:
     int getPhoenix() const;
     void setAntidote(int antidote);
     int getAntidote() const;
-    void setBag(BaseBag * bag);
-    BaseBag *getBag() const;
+    BaseBag *getBag();
     void setType(KnightType type);
     bool checkRecover();    
     KnightType getType() const;
