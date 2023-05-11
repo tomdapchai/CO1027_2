@@ -29,8 +29,8 @@ class KnightAdventure;
 
 class Events {
 public:
-    int *event = new int[1000];
     int eventNum;
+    int *event;
     Events(const string & file_events);
     int count() const;
     int get(int i) const;
@@ -109,7 +109,7 @@ public:
     void addItemHead(ItemType item);
     int itemCount();
     virtual bool insertFirst(BaseItem * item) = 0;
-    virtual void use(BaseKnight * knight, BaseItem * item);
+    void use(BaseKnight * knight, BaseItem * item);
     void removeItemHead();
     void swapItemHead(BaseItem * need);
     BaseItem * searchPhoenixFirst(BaseKnight * knight);
