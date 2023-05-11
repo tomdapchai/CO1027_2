@@ -747,6 +747,8 @@ bool ArmyKnights::fight(BaseOpponent * opponent) {//use to check if lastKnight s
 
 bool ArmyKnights::adventure(Events * event) {//use to perform action, the final return is if the army win or not
     for (int i = 0; i < event->count(); i++) {
+        int currentHP = lastKnight()->getHP();
+        int currentId = lastID;
         if (omegaWeapon && event->get(i) == 10) {
             printInfo();
             continue;
@@ -778,8 +780,9 @@ bool ArmyKnights::adventure(Events * event) {//use to perform action, the final 
             }  
         }
         here:
-        if (lastKnight()->getBag()->searchPhoenixFirst(lastKnight()) != NULL)
-            lastKnight()->getBag()->use(lastKnight(), lastKnight()->getBag()->searchPhoenixFirst(lastKnight()));
+        if (lastKnight()->getHP() < currentHP && lastKnight()->getId() == currentId)
+            if (lastKnight()->getBag()->searchPhoenixFirst(lastKnight()) != NULL)
+                lastKnight()->getBag()->use(lastKnight(), lastKnight()->getBag()->searchPhoenixFirst(lastKnight()));
         delete opponent;
         printInfo();
         continue;
